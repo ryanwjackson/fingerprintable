@@ -71,4 +71,11 @@ RSpec.describe Fingerprintable::Fingerprinter do
     it { expect(f1).to be_diff(f2) }
     it { expect(f1.diff(f2).sort).to eq(%i[@name]) }
   end
+
+  describe '.diff' do
+    let(:obj1) { Fingerprintable::FingerprinterTestObject.new(name: :name1) }
+    let(:obj2) { Fingerprintable::FingerprinterTestObject.new(name: :name2) }
+
+    it { expect(described_class.diff(obj1, obj2).sort).to eq(%i[@name]) }
+  end
 end

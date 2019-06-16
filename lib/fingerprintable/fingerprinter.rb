@@ -77,6 +77,22 @@ module Fingerprintable
       @to_s ||= deep_convert_and_sort(object_values_hash).to_s
     end
 
+    def self.diff(obj1, obj2)
+      f1 =  if obj1.respond_to?(:fingerprinter)
+              obj1.fingerprinter
+            else
+              Fingerprinter.new(object: obj1)
+            end
+
+      f2 =  if obj2.respond_to?(:fingerprinter)
+              obj2.fingerprinter
+            else
+              Fingerprinter.new(object: obj2)
+            end
+
+      f1.diff(f2)
+    end
+
     private
 
     def fingerprint_object(use_object)
