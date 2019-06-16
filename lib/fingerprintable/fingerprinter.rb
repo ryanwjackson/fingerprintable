@@ -3,7 +3,6 @@
 module Fingerprintable
   class Fingerprinter
     attr_reader :attributes,
-                :cache,
                 :fallback_to_string,
                 :ignore,
                 :object
@@ -21,6 +20,25 @@ module Fingerprintable
       @attributes = ((object.instance_variables | attributes) - ignore).map(&:to_sym).sort
       @cache = cache || {}
       @cache[object] = next_cache_id
+      @fingerprinted = false
+    end
+
+    def cache
+      fingerprint unless @fingerprinted
+      @cache
+    end
+
+    def diff(other_fingerprinter)
+      raise "Passed object (#{other_fingerprinter.class.name}) does not match the fingerprinter object class: #{object.class.name}" if object.class != other_fingerprinter.object.class
+
+      values = object_values_hash
+      other_values = other_fingerprinter.object_values_hash
+
+      (attributes | other_fingerprinter.attributes).reject { |e| values[e] == other_values[e] }
+    end
+
+    def diff?(other_fingerprinter)
+      diff(other_fingerprinter).any?
     end
 
     def deep_convert_and_sort(obj)
@@ -34,7 +52,7 @@ module Fingerprintable
       when Array
         obj.map { |v| deep_convert_and_sort(v) }.sort.to_s
       when Hash
-        Hash[obj.map { |k, v| [k, deep_convert_and_sort(v)] }].sort.to_s
+        Hash[obj.map { |k, v| [deep_convert_and_sort(k), deep_convert_and_sort(v)] }].sort.to_s
       when Module
         obj.name
       else
@@ -44,12 +62,19 @@ module Fingerprintable
 
     def fingerprint
       @fingerprint ||= begin
+        @fingerprinted = true
         Digest::MD5.hexdigest(to_s)
       end
     end
 
+    def object_values_hash
+      @object_values_hash ||= Hash[attributes.map do |attr|
+        [attr, object.instance_variable_get(attr)]
+      end]
+    end
+
     def to_s
-      @to_s ||= deep_convert_and_sort(object_value_hash).to_s
+      @to_s ||= deep_convert_and_sort(object_values_hash).to_s
     end
 
     private
@@ -78,12 +103,6 @@ module Fingerprintable
     def next_cache_id
       # "#{SecureRandom.uuid}-#{@cache.count}"
       @cache.count
-    end
-
-    def object_value_hash
-      Hash[attributes.map do |attr|
-        [attr, object.instance_variable_get(attr)]
-      end]
     end
   end
 end

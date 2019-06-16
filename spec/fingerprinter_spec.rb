@@ -31,7 +31,7 @@ RSpec.describe Fingerprintable::Fingerprinter do
   end
 
   it 'fingerprints' do
-    expected_fingerprint = '4d5eb5f16602766f3178a98be2c770f0'
+    expected_fingerprint = '826f9904b35860b8301f87d7c0839e3e'
 
     expect(fingerprint(obj1)).to eq(expected_fingerprint)
     expect(fingerprint(obj1)).to eq(expected_fingerprint)
@@ -49,7 +49,7 @@ RSpec.describe Fingerprintable::Fingerprinter do
     obj2.foo = obj3
     obj3.foo = obj1
 
-    expected_fingerprint = '422cbf9f3e82a153aff21db35d6d8481'
+    expected_fingerprint = 'fe3c49aeb8d8debe3052a6c784ac6c49'
 
     expect(fingerprint(obj1)).to eq(expected_fingerprint)
     expect(fingerprint(obj1)).to eq(expected_fingerprint)
@@ -57,10 +57,18 @@ RSpec.describe Fingerprintable::Fingerprinter do
     obj2.foo = :new_val
     updated_finger_print = fingerprint(obj1)
     expect(updated_finger_print).not_to eq(expected_fingerprint)
-    expect(updated_finger_print).to eq('6a47e51afe405c51237d86b7f3b755e4')
+    expect(updated_finger_print).to eq('e81ecc3016019e0d8ee6eb12e8f7bef3')
 
     obj1.foo = '9.99'
     expect(fingerprint(obj1)).not_to eq(updated_finger_print)
-    expect(fingerprint(obj1)).to eq('3687f7efae58f37ff365e11dae58cd6d')
+    expect(fingerprint(obj1)).to eq('2b79459a43745cc788fcfd33b38ec2fc')
+  end
+
+  describe '#diff' do
+    let(:f1) { described_class.new(object: obj1) }
+    let(:f2) { described_class.new(object: obj2) }
+
+    it { expect(f1).to be_diff(f2) }
+    it { expect(f1.diff(f2).sort).to eq(%i[@name]) }
   end
 end
