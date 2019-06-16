@@ -17,7 +17,7 @@ module Fingerprintable
       @fallback_to_string = fallback_to_string
       @ignore = ignore | ignore.map { |e| "@#{e}".to_sym }
       @object = object
-      @attributes = ((object.instance_variables | attributes) - ignore).map(&:to_sym).sort
+      @attributes = populate_attributes(attributes: attributes, ignore: ignore)
       @cache = cache || {}
       @cache[object] = next_cache_id
       @fingerprinted = false
@@ -69,7 +69,7 @@ module Fingerprintable
 
     def object_values_hash
       @object_values_hash ||= Hash[attributes.map do |attr|
-        [attr, object.instance_variable_get(attr)]
+        [attr, object.send(attr)]
       end]
     end
 
@@ -117,8 +117,17 @@ module Fingerprintable
     end
 
     def next_cache_id
-      # "#{SecureRandom.uuid}-#{@cache.count}"
       @cache.count
+    end
+
+    def populate_attributes(attributes:, ignore:)
+      instance_variables = Hash[object.instance_variables.map { |e| [e, 1] }]
+      ret = object.class.instance_methods.select do |method|
+        instance_variables.key?("@#{method}".to_sym)
+      end
+      ret |= attributes
+      ret -= ignore
+      ret.map(&:to_sym).sort
     end
   end
 end

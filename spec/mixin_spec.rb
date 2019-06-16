@@ -23,6 +23,6 @@ RSpec.describe Fingerprintable::Mixin do
   let(:fingerprinter) { obj.fingerprinter }
 
   it do
-    expect(fingerprinter.attributes.sort).to eq(%i[@foo asdf baz])
+    expect(fingerprinter.attributes.sort).to eq(%i[asdf baz foo])
   end
 end
