@@ -1,5 +1,7 @@
 # Fingerprintable
 
+[![Build Status](https://travis-ci.org/ryanwjackson/fingerprintable.svg?branch=master)](https://travis-ci.org/ryanwjackson/fingerprintable) [![Coverage Status](https://coveralls.io/repos/github/ryanwjackson/fingerprintable/badge.svg?branch=master)](https://coveralls.io/github/ryanwjackson/fingerprintable?branch=master)
+
 Fingerprintable is an easy way to fingerprint any object in Ruby.  It handles cycles and allows you to override what attributes you want to include in the fingerprint.
 
 By default, Fingerprintable will use all instance variables of an object.
