@@ -1,6 +1,21 @@
+# frozen_string_literal: true
+
+require 'simplecov'
+require 'coveralls'
+Coveralls.wear!('rails')
+
+SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new(
+  [
+    Coveralls::SimpleCov::Formatter,
+    SimpleCov::Formatter::HTMLFormatter
+  ]
+)
+
+SimpleCov.start
+
+require 'bundler/setup'
 require 'ap'
 require 'fingerprintable/debug'
-require 'bundler/setup'
 require 'byebug'
 require 'fingerprintable'
 
